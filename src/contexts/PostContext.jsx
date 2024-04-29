@@ -24,6 +24,36 @@ export const PostProvider = ({ children }) => {
     }
   };
 
+  //New post using JSONPlaceholder API
+  const handleCreate = async () => {
+    try {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts`,
+        {
+          method: "POST",
+          body: JSON.stringify(newPost),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }
+      );
+      if (response.ok) {
+        if (!newPost.userId || !newPost.body || !newPost.title) return;
+        console.log("Post created successfully");
+        const createdPost = await response.json();
+        const maxId = Math.max(...postData.map((data) => data.id));
+        const newId = maxId + 1;
+        const newPostWithId = { ...createdPost, id: newId };
+        setPostData([...postData, newPostWithId]);
+        setNewPost({ title: "", body: "", userId: "" });
+      } else {
+        console.error("Failed to create post");
+      }
+    } catch (error) {
+      console.error("Error creating post:", error);
+    }
+  };
+
   // Edit post using JSONPlaceholder API
   const handleEdit = async (id) => {
     try {
@@ -52,35 +82,6 @@ export const PostProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error editing post:", error);
-    }
-  };
-
-  const handleCreate = async () => {
-    try {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts`,
-        {
-          method: "POST",
-          body: JSON.stringify(newPost),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-        }
-      );
-      if (response.ok) {
-        if (!newPost.userId || !newPost.body || !newPost.title) return;
-        console.log("Post created successfully");
-        const createdPost = await response.json();
-        const maxId = Math.max(...postData.map((data) => data.id));
-        const newId = maxId + 1;
-        const newPostWithId = { ...createdPost, id: newId };
-        setPostData([...postData, newPostWithId]);
-        setNewPost({ title: "", body: "", userId: "" });
-      } else {
-        console.error("Failed to create post");
-      }
-    } catch (error) {
-      console.error("Error creating post:", error);
     }
   };
 
